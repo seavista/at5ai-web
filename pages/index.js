@@ -31,9 +31,9 @@ function Home() {
       <div className="video-container">
         <video 
           src="/videos/at5ai-intro.mp4" 
-          autoPlay 
-          muted 
-          loop 
+          autoPlay
+          muted
+          loop
           playsInline 
           className={styles.video}
         />

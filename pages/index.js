@@ -28,11 +28,16 @@ function Home() {
 
   return (
     <main className={styles.body}>
-     
-        <div class="logo-container">
-          
-        <img src="pages/images/at5ai-logo.png" alt="Logo" class="logo" />
-    </div>
+      <div className="video-container">
+        <video 
+          src="/videos/at5ai-intro.mp4" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          className={styles.video}
+        />
+      </div>
     </main>
   )
 }

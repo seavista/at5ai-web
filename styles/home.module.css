@@ -2,7 +2,7 @@
   padding: 20px 20px 60px;
   max-width: 680px;
   margin: 0 auto;
-  background-color: #101010;
+  background-color: #000000;
 }
 
 .hr {
@@ -17,7 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #101010;
+  background-color: #000000;
 }
 
 .logo-container {
@@ -28,6 +28,20 @@
   transform: scale(0.98);
   animation: logoIntro 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.video {
+  max-width: 100%;
+  height: auto;
+}
+
 
 @keyframes logoIntro {
   from {

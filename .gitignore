@@ -19,6 +19,8 @@
 .DS_Store
 *.pem
 CNAME
+.nojekyll
+
 
 # debug
 npm-debug.log*

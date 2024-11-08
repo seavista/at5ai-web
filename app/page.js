@@ -1,6 +1,6 @@
 'use client';
-
-import styles from '../styles/home.module.css'
+import './globals.css' 
+import styles from './styles/home.module.css'
 
 
 
@@ -25,7 +25,10 @@ const App = () => {
           {menuItems.map((item) => (
             <button 
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => {
+                console.log('Clicked:', item.id);
+                setActiveSection(item.id);
+              }}
               className={`transform transition-all duration-300 hover:scale-110 ${
                 activeSection === item.id ? 'text-white' : 'text-gray-500'
               }`}
@@ -43,22 +46,29 @@ const App = () => {
 
   const Logo = ({ isHome }) => {
     const logoStyle = isHome ? {
-      width: '100%', // This allows the max-width classes to control the size
-      maxWidth: '200px', // Fallback max-width
+      width: '100%',
+      maxWidth: '200px',
+      opacity: 1,
     } : {
-      width: '40px', // Smaller size for nav
+      width: '40px',
       transition: 'all 0.3s ease',
+      opacity: 1,
     };
 
     return (
       isHome ? (
-        <div className={styles['logo-container']}>
+        <motion.div 
+          className={styles['logo-container']}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+        >
           <img 
             src='/images/at5ai-logo.png'
             alt="AT5AI Logo"
             className={styles.logo}
+            style={{ opacity: 1 }}
           />
-        </div>
+        </motion.div>
       ) : (
         <div 
           className="fixed left-0 top-0 w-20 h-20 flex items-center justify-center border-b border-white/10 z-[51] cursor-pointer"
@@ -114,8 +124,8 @@ const App = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-6 text-base sm:text-lg md:text-xl font-mono tracking-wide opacity-70"
         >
-          High-Signal, Fact-Checked News. No Fluff. 
-          <span className="block mt-2 text-sm opacity-50">Breaking down the <u>REAL</u> news in minutes</span>
+          High-Signal, AI News and Tech. No Fluff. 
+          <span className="block mt-2 text-sm opacity-50">Breaking down the latest AI in minutes</span>
          
         </motion.p>
       </div>
@@ -213,7 +223,7 @@ const App = () => {
       
       <NavigationMenu />
       <main className="ml-20">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           {renderSection()}
         </AnimatePresence>
       </main>

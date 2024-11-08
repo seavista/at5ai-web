@@ -122,8 +122,8 @@ const App = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-6 text-base sm:text-lg md:text-xl font-mono tracking-wide opacity-70"
         >
-          High-Signal Tech News. No Fluff. 
-          <span className="block mt-2 text-sm opacity-50">Breaking down AI & tech in minutes</span>
+          High-Signal, Fact-Checked News. No Fluff. 
+          <span className="block mt-2 text-sm opacity-50">Breaking down the <u>REAL</u> news in minutes</span>
          
         </motion.p>
       </div>

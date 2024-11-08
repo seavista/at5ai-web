@@ -10,16 +10,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Unique typography-driven design with black and white theme
 const App = () => {
   const [activeSection, setActiveSection] = useState('home');
-  const [scrollPosition, setScrollPosition] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const NavigationMenu = () => {
     const menuItems = [
@@ -87,8 +77,10 @@ const App = () => {
 
   const HomePage = () => (
     <motion.div 
+      key="home"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-black text-white flex flex-col justify-center p-12"
     >
@@ -131,7 +123,13 @@ const App = () => {
   );
 
   const VideosPage = () => (
-    <div className="min-h-screen bg-black text-white p-12">
+    <motion.div
+      key="videos"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-black text-white p-12"
+    >
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {[1, 2, 3, 4].map((video, index) => (
           <motion.div
@@ -155,11 +153,17 @@ const App = () => {
           </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 
   const BlogPage = () => (
-    <div className="min-h-screen bg-black text-white p-12">
+    <motion.div
+      key="blog"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-black text-white p-12"
+    >
       {[1, 2, 3].map((post, index) => (
         <motion.article
           key={post}
@@ -181,7 +185,7 @@ const App = () => {
           </p>
         </motion.article>
       ))}
-    </div>
+    </motion.div>
   );
 
   const renderSection = () => {

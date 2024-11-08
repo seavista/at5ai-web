@@ -159,116 +159,14 @@ export default function Home() {
   );
 
   const VideosPage = () => {
-    const [shorts, setShorts] = useState([]);
-    const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const channelId = 'UCqcbQf6yw5KzRoDDcZ_wBSw';
+    const playlistId = 'PLUtqq-ngYy83Z9uohILgaO6kWYVJRsx1l'; // Replace with your playlist ID
 
     useEffect(() => {
-      const CACHE_DURATION = 3600000; // 1 hour in milliseconds
-      const CACHE_KEY = `youtube_videos_${channelId}`;
-
-      const fetchVideos = async () => {
-        try {
-          // Check cache first
-          const cachedData = localStorage.getItem(CACHE_KEY);
-          if (cachedData) {
-            const { data, timestamp } = JSON.parse(cachedData);
-            if (Date.now() - timestamp < CACHE_DURATION) {
-              setShorts(data.shorts);
-              setVideos(data.regular);
-              setLoading(false);
-              return;
-            }
-          }
-
-          if (!process.env.NEXT_PUBLIC_YOUTUBE_API_KEY) {
-            throw new Error('YouTube API key is missing');
-          }
-
-          // Reduce maxResults to minimize quota usage
-          const searchResponse = await axios.get(
-            'https://www.googleapis.com/youtube/v3/search',
-            {
-              params: {
-                key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY,
-                channelId: channelId,
-                part: 'snippet,id',
-                order: 'date',
-                maxResults: 25, // Reduced from 50
-                type: 'video'
-              }
-            }
-          );
-
-          if (searchResponse.data.items) {
-            const videoIds = searchResponse.data.items.map(item => item.id.videoId).join(',');
-            const detailsResponse = await axios.get(
-              'https://www.googleapis.com/youtube/v3/videos',
-              {
-                params: {
-                  key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY,
-                  id: videoIds,
-                  part: 'snippet,contentDetails'
-                }
-              }
-            );
-
-            const processedVideos = detailsResponse.data.items.reduce((acc, video) => {
-              const isShort = 
-                parseDuration(video.contentDetails.duration) <= 60 ||
-                video.snippet.title.toLowerCase().includes('#shorts') ||
-                video.snippet.description.toLowerCase().includes('#shorts') ||
-                (video.snippet.thumbnails.maxres || video.snippet.thumbnails.standard)?.height > 
-                (video.snippet.thumbnails.maxres || video.snippet.thumbnails.standard)?.width;
-
-              if (isShort) {
-                acc.shorts.push(video);
-              } else {
-                acc.regular.push(video);
-              }
-              return acc;
-            }, { shorts: [], regular: [] });
-
-            // Cache the results
-            localStorage.setItem(CACHE_KEY, JSON.stringify({
-              data: processedVideos,
-              timestamp: Date.now()
-            }));
-
-            setShorts(processedVideos.shorts);
-            setVideos(processedVideos.regular);
-          }
-          setLoading(false);
-        } catch (error) {
-          console.error('Error fetching videos:', error.response?.data || error.message);
-          
-          // On error, try to use cached data even if expired
-          const cachedData = localStorage.getItem(CACHE_KEY);
-          if (cachedData) {
-            const { data } = JSON.parse(cachedData);
-            setShorts(data.shorts);
-            setVideos(data.regular);
-            setError('Using cached data - Unable to fetch latest videos');
-          } else {
-            setError(error.response?.data?.error?.message || 'Failed to load videos');
-          }
-          setLoading(false);
-        }
-      };
-
-      fetchVideos();
+      // Simulate loading for smoother transition
+      const timer = setTimeout(() => setLoading(false), 500);
+      return () => clearTimeout(timer);
     }, []);
-
-    // Helper function to parse ISO 8601 duration to seconds
-    const parseDuration = (duration) => {
-      const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-      const hours = (parseInt(match[1]) || 0);
-      const minutes = (parseInt(match[2]) || 0);
-      const seconds = (parseInt(match[3]) || 0);
-      return hours * 3600 + minutes * 60 + seconds;
-    };
 
     if (loading) {
       return (
@@ -283,19 +181,6 @@ export default function Home() {
       );
     }
 
-    if (error) {
-      return (
-        <motion.div
-          key="videos-error"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="min-h-screen bg-black text-white p-12 flex items-center justify-center"
-        >
-          <div className="text-xl font-mono text-red-500">{error}</div>
-        </motion.div>
-      );
-    }
-
     return (
       <motion.div
         key="videos"
@@ -304,80 +189,16 @@ export default function Home() {
         exit={{ opacity: 0 }}
         className="min-h-screen bg-black text-white p-12"
       >
-        {/* Shorts Section */}
-        {shorts.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 uppercase tracking-wider">Shorts</h2>
-            <div className="relative">
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="flex space-x-4 pb-4">
-                  {shorts.map((video, index) => (
-                    <motion.div
-                      key={video.id}
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="flex-none w-[200px] bg-white/5 border border-white/10 group cursor-pointer"
-                      onClick={() => window.open(`https://youtube.com/shorts/${video.id}`, '_blank')}
-                    >
-                      <div className="aspect-[9/16] bg-white/10 relative overflow-hidden">
-                        <img 
-                          src={video.snippet.thumbnails.high.url} 
-                          alt={video.snippet.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <span className="text-white font-mono tracking-wider">PLAY</span>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="text-sm font-bold uppercase tracking-wider line-clamp-2">
-                          {video.snippet.title}
-                        </h3>
-                        <p className="text-xs font-mono text-white/50 mt-2">
-                          {new Date(video.snippet.publishedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Regular Videos Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6 uppercase tracking-wider">Videos</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {videos.map((video, index) => (
-              <motion.div
-                key={video.id}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="bg-white/5 border border-white/10 p-4 group cursor-pointer"
-                onClick={() => window.open(`https://youtube.com/watch?v=${video.id}`, '_blank')}
-              >
-                <div className="aspect-video bg-white/10 mb-4 relative overflow-hidden">
-                  <img 
-                    src={video.snippet.thumbnails.high.url} 
-                    alt={video.snippet.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="text-white font-mono tracking-wider">PLAY</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold uppercase tracking-wider mb-2 line-clamp-2">
-                  {video.snippet.title}
-                </h3>
-                <p className="text-xs font-mono text-white/50">
-                  {new Date(video.snippet.publishedAt).toLocaleDateString()}
-                </p>
-              </motion.div>
-            ))}
-          </div>
+        <div className="aspect-video w-full max-w-6xl mx-auto">
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube.com/embed/videoseries?list=${playlistId}`}
+            title="AT5AI YouTube Playlist"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </div>
       </motion.div>
     );

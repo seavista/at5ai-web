@@ -7,7 +7,7 @@ const nextConfig = {
   // images: {
   //   unoptimized: true, // Disable Next.js image optimization for GitHub Pages
   // },
-  output: 'standalone',
+ // output: 'standalone',
   // Add pretty output in production
   compress: false,
 

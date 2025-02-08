@@ -16,7 +16,8 @@ export default function Home() {
     const menuItems = [
       { id: 'home', label: 'HOME', icon: '01' },
       { id: 'videos', label: 'VIDEOS', icon: '02' },
-      { id: 'blog', label: 'BLOG', icon: '03' }
+      { id: 'blog', label: 'BLOG', icon: '03' },
+      { id: 'tools', label: 'TOOLS', icon: '04' }
     ];
 
     // Add social media links data
@@ -218,16 +219,17 @@ export default function Home() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedPost, setSelectedPost] = useState(null);
 
     useEffect(() => {
       const fetchPosts = async () => {
         try {
-          // Replace with your Medium RSS feed URL (add /?format=json at the end)
-          const response = await axios.get('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@jhawgood');
+          // Replace with your Google Blogger API URL
+          const response = await axios.get('https://www.googleapis.com/blogger/v3/blogs/1013667258133036871/posts?key=AIzaSyDNwr2aSSua45zL77djlJzMscBiJFQzUpE');
           setPosts(response.data.items);
           setLoading(false);
         } catch (err) {
-          console.error('Error fetching Medium posts:', err);
+          console.error('Error fetching Blogger posts:', err);
           setError('Failed to load blog posts');
           setLoading(false);
         }
@@ -262,6 +264,23 @@ export default function Home() {
       );
     }
 
+    if (selectedPost) {
+      return (
+        <motion.div
+          key="blog-detail"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="min-h-screen bg-black text-white p-12"
+        >
+          <button onClick={() => setSelectedPost(null)} className="text-white mb-4">Back to Posts</button>
+          <h2 className="text-4xl font-black uppercase tracking-tighter">{selectedPost.title}</h2>
+          <div className="mt-4 text-white/70 font-mono tracking-wide" dangerouslySetInnerHTML={{ __html: selectedPost.content }} />
+          <div className="mt-2 text-sm font-mono text-white/50">{new Date(selectedPost.published).toLocaleDateString()}</div>
+        </motion.div>
+      );
+    }
+
     return (
       <motion.div
         key="blog"
@@ -272,12 +291,12 @@ export default function Home() {
       >
         {posts.map((post, index) => (
           <motion.article
-            key={post.guid}
+            key={post.id}
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.3 }}
             className="border-b border-white/10 pb-8 mb-8 group cursor-pointer"
-            onClick={() => window.open(post.link, '_blank')}
+            onClick={() => setSelectedPost(post)}
           >
             <div className="flex items-center justify-between">
               <h2 className="text-4xl font-black uppercase tracking-tighter">
@@ -287,11 +306,16 @@ export default function Home() {
                 READ MORE →
               </span>
             </div>
-            <p className="mt-4 text-white/70 font-mono tracking-wide">
-              {post.description.replace(/<[^>]*>/g, '').substring(0, 200)}...
-            </p>
+            <div className="flex items-center mt-4">
+              {post.images && post.images.length > 0 && (
+                <img src={post.images[0].url} alt={post.title} className="w-20 h-20 object-cover mr-4" />
+              )}
+              <p className="text-white/70 font-mono tracking-wide">
+                {post.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
+              </p>
+            </div>
             <div className="mt-2 text-sm font-mono text-white/50">
-              {new Date(post.pubDate).toLocaleDateString()}
+              {new Date(post.published).toLocaleDateString()}
             </div>
           </motion.article>
         ))}

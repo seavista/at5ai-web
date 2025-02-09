@@ -224,8 +224,8 @@ export default function Home() {
     useEffect(() => {
       const fetchPosts = async () => {
         try {
-          // Replace with your Google Blogger API URL
-          const response = await axios.get('https://www.googleapis.com/blogger/v3/blogs/1013667258133036871/posts?key=AIzaSyDNwr2aSSua45zL77djlJzMscBiJFQzUpE');
+          const apiKey = process.env.NEXT_PUBLIC_BLOGGER_API_KEY;
+          const response = await axios.get(`https://www.googleapis.com/blogger/v3/blogs/1013667258133036871/posts?key=${apiKey}`);
           setPosts(response.data.items);
           setLoading(false);
         } catch (err) {
